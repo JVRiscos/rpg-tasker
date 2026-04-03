@@ -9,20 +9,19 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up(): void
-{
-    Schema::create('tasks', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('user_id')->constrained()->onDelete('cascade');
-        $table->foreignId('category_id')->constrained();
-        $table->string('title');
-        $table->text('description')->nullable();
-        $table->boolean('is_completed')->default(false);
-        $table->string('frequency'); // 'daily', 'weekly', 'once'
-        $table->timestamps('created_at');
-        $table->timestamps('updated_at');
-    });
-}
+    public function up(): void
+    {
+        Schema::create('tasks', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('category_id')->constrained();
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->boolean('is_completed')->default(false);
+            $table->string('frequency'); // 'daily', 'weekly', 'once'
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

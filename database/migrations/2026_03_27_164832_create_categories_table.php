@@ -10,16 +10,15 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('categories', function (Blueprint $table) {
-        $table->id();
-        $table->string('name');
-        $table->integer('base_xp');
-        $table->string('linked_stat'); // 'str', 'int' 'sta' o 'def'
-        $table->timestamps('created_at');
-        $table->timestamps('updated_at');
-    });
-}
+    {
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('base_xp');
+            $table->string('linked_stat'); // 'str', 'int' 'sta' o 'def'
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.
