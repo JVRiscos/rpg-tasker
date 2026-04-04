@@ -13,28 +13,45 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { dashboard, personaje, tienda, misiones, ajustes } from '@/routes';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
+
     {
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
     },
+    {
+        title: 'Personaje',
+        href: personaje(),
+
+
+    },
+    {
+        title: 'Tienda',
+        href: tienda(),
+
+
+    },
+    {
+        title: 'Misiones',
+        href: misiones(),
+
+
+    },
+
+
 ];
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
+        title: 'Ajustes',
+        href: ajustes(),
+        
     },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
+    
 ];
 
 export function AppSidebar() {
