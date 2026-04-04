@@ -13,8 +13,10 @@ import { email } from '@/routes/password';
 export default function ForgotPassword({ status }: { status?: string }) {
     return (
         <AuthLayout
-            title="Forgot password"
-            description="Enter your email to receive a password reset link"
+            title=""
+            description=""
+            
+
         >
             <Head title="Restablecer contraseña" />
 
@@ -174,7 +176,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                         {processing && (
                                             <LoaderCircle className="h-4 w-4 animate-spin" />
                                         )}
-                                        Enviar enlace de restablecimiento
+                                        Enviar enlace
                                     </Button>
                                 </div>
                             </>
