@@ -1,7 +1,9 @@
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
+import { FormNewTask } from '@/components/form-new-task';
 import { misiones } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
+
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -178,9 +180,7 @@ export default function Misiones() {
                                 <option>Salud</option>
                                 <option>Estudios</option>
                             </select>
-                            <button className="btn-new-quest" type="button">
-                                + Nueva Misión
-                            </button>
+                            <FormNewTask />
                         </div>
                     </header>
 
