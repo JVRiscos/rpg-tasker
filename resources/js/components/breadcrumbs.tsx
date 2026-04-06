@@ -19,6 +19,12 @@ export function Breadcrumbs({
         <>
             {breadcrumbs.length > 0 && (
                 <Breadcrumb>
+                <style>
+                    {`
+                        button{color: black;}
+                        button:hover{color: var(--primary);}
+                    `}
+                </style>
                     <BreadcrumbList>
                         {breadcrumbs.map((item, index) => {
                             const isLast = index === breadcrumbs.length - 1;
