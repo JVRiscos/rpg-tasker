@@ -1,12 +1,12 @@
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { dashboard } from '@/routes';
+import { tienda } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Tienda',
-        href: dashboard(),
+        href: tienda(),
     },
 ];
 
