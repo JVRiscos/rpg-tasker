@@ -3,6 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { FormNewTask } from '@/components/form-new-task';
 import { misiones } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
+import { Tarea } from '@/components/ui/tarea';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -15,11 +16,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Misiones() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="RPG-Tasker | Tablón de Misiones">
-                <link
-                    rel="stylesheet"
-                    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-                />
+            <Head title="RPG-Tasker | Misiones">
+                
             </Head>
 
             <div className="min-h-screen bg-[#f8fafc] text-slate-900">
@@ -60,88 +58,6 @@ export default function Misiones() {
                         display: flex;
                         align-items: center;
                         gap: 10px;
-                    }
-
-                    .quest-card {
-                        background: white;
-                        border-radius: 12px;
-                        padding: 20px;
-                        margin-bottom: 15px;
-                        display: flex;
-                        align-items: center;
-                        transition: transform 0.2s;
-                        border-left: 5px solid #cbd5e1;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                    }
-
-                    .quest-card:hover {
-                        transform: translateX(5px);
-                    }
-
-                    .quest-main {
-                        border-left-color: var(--accent);
-                    }
-
-                    .quest-daily {
-                        border-left-color: var(--primary);
-                    }
-
-                    .quest-icon {
-                        width: 50px;
-                        height: 50px;
-                        background: #f1f5f9;
-                        border-radius: 10px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 1.5rem;
-                        margin-right: 20px;
-                    }
-
-                    .quest-content {
-                        flex: 1;
-                    }
-
-                    .quest-content h4 {
-                        margin: 0 0 5px 0;
-                        color: var(--dark);
-                    }
-
-                    .quest-content p {
-                        margin: 0;
-                        font-size: 0.9rem;
-                        color: #64748b;
-                    }
-
-                    .quest-reward {
-                        text-align: right;
-                        min-width: 120px;
-                    }
-
-                    .reward-xp {
-                        color: var(--primary);
-                        font-weight: bold;
-                        display: block;
-                    }
-
-                    .btn-actions {
-                        display: flex;
-                        gap: 10px;
-                        margin-left: 20px;
-                    }
-
-                    .btn-icon {
-                        background: #f1f5f9;
-                        border: none;
-                        padding: 10px;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        color: #64748b;
-                    }
-
-                    .btn-icon:hover {
-                        background: #e2e8f0;
-                        color: var(--danger);
                     }
 
                     .filter-bar input {
@@ -189,28 +105,11 @@ export default function Misiones() {
                             <i className="fa-solid fa-scroll" style={{ color: 'var(--accent)' }} />
                             Misiones Principales
                         </h3>
-
-                        <div className="quest-card quest-main">
-                            <div className="quest-icon">
-                                <i className="fa-solid fa-code" style={{ color: 'var(--accent)' }} />
-                            </div>
-                            <div className="quest-content">
-                                <h4>Finalizar Proyecto DAW</h4>
-                                <p>Entregar la documentación y el código fuente antes de la fecha límite.</p>
-                            </div>
-                            <div className="quest-reward">
-                                <span className="reward-xp">+500 INT XP</span>
-                                <small>Dificultad: Épica</small>
-                            </div>
-                            <div className="btn-actions">
-                                <button className="btn-icon" type="button">
-                                    <i className="fa-solid fa-pen-to-square" />
-                                </button>
-                                <button className="btn-icon" type="button">
-                                    <i className="fa-solid fa-trash" />
-                                </button>
-                            </div>
-                        </div>
+                        <Tarea frequency="once" />
+                        <Tarea frequency="daily" />
+                        <Tarea frequency="weekly" />
+                        <Tarea frequency="weekly" />
+                        <Tarea frequency="weekly" />
                     </section>
 
                     <section className="quest-section">
