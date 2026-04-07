@@ -8,7 +8,7 @@ Route::inertia('/', 'welcome', [
 ])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::inertia('bitacora', 'bitacora')->name('bitacora');
     Route::inertia('personaje', 'personaje')->name('personaje');
     Route::inertia('misiones', 'misiones')->name('misiones');
     Route::inertia('tienda', 'tienda')->name('tienda');
