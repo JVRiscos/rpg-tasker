@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -20,41 +21,119 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
-export function FormNewTask() {
-    const [open, setOpen] = useState(false);
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        category: '',
-        attribute: '',
-        difficulty: '',
-        deadline: '',
-    });
+interface Category {
+    id: number;
+    name: string;
+}
+
+interface TaskEdit {
+    id: number;
+    title: string;
+    description: string | null;
+    frequency: 'daily' | 'weekly' | 'once';
+    is_completed: boolean;
+    category: Category;
+}
+
+interface FormNewTaskProps {
+    categories: Category[];
+    editTask?: TaskEdit | null;
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    clearEditTask: () => void;
+}
+
+const emptyForm = {
+    name: '',
+    description: '',
+    category_id: '',
+    frequency: '',
+    attribute: '',
+    difficulty: '',
+    deadline: '',
+};
+
+export function FormNewTask({ categories, editTask, open, setOpen, clearEditTask }: FormNewTaskProps) {
+    const [formData, setFormData] = useState({ ...emptyForm });
+
+    useEffect(() => {
+        if (editTask) {
+            setFormData({
+                name: editTask.title,
+                description: editTask.description ?? '',
+                category_id: editTask.category.id.toString(),
+                frequency: editTask.frequency,
+                attribute: '',
+                difficulty: '',
+                deadline: '',
+            });
+            setOpen(true);
+            return;
+        }
+
+        if (!open) {
+            setFormData({ ...emptyForm });
+        }
+    }, [editTask, open, setOpen]);
 
     const handleInputChange = (field: string, value: string) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
+
+    const resetForm = () => {
+        setFormData({ ...emptyForm });
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Aquí iría la lógica para enviar la tarea al backend
-        console.log('Nueva tarea:', formData);
-        setOpen(false);
-        // Reset form
-        setFormData({
-            name: '',
-            description: '',
-            category: '',
-            attribute: '',
-            difficulty: '',
-            deadline: '',
+
+        const payload = {
+            title: formData.name,
+            description: formData.description,
+            category_id: parseInt(formData.category_id, 10) || null,
+            frequency: formData.frequency,
+            is_completed: editTask ? editTask.is_completed : false,
+        };
+
+        if (editTask) {
+            router.put(`/tasks/${editTask.id}`, payload, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setOpen(false);
+                    clearEditTask();
+                    resetForm();
+                    window.location.reload();
+                },
+            });
+            return;
+        }
+
+        router.post('/tasks', payload, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setOpen(false);
+                resetForm();
+                window.location.reload();
+            },
         });
     };
 
+    const handleOpenNew = () => {
+        clearEditTask();
+        resetForm();
+        setOpen(true);
+    };
+
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={(value) => {
+            if (!value) {
+                clearEditTask();
+            }
+            setOpen(value);
+        }}>
             <DialogTrigger asChild>
-                <Button className="bg-[#6366f1] hover:bg-[#a855f7] text-white">
+                <Button type="button" onClick={handleOpenNew} className="bg-[#6366f1] hover:bg-[#a855f7] text-white">
                     + Nueva Misión
                 </Button>
             </DialogTrigger>
@@ -166,15 +245,16 @@ export function FormNewTask() {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="form-group">
                                 <Label htmlFor="category">Categoría</Label>
-                                <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                                <Select value={formData.category_id} onValueChange={(value) => handleInputChange('category_id', value)}>
                                     <SelectTrigger className="bg-white text-black border border-slate-200">
                                         <SelectValue placeholder="Seleccionar" />
                                     </SelectTrigger>
                                     <SelectContent className="bg-white text-black border border-slate-200">
-                                        <SelectItem value="trabajo">Trabajo</SelectItem>
-                                        <SelectItem value="salud">Salud</SelectItem>
-                                        <SelectItem value="estudios">Estudios</SelectItem>
-                                        <SelectItem value="personal">Personal</SelectItem>
+                                        {categories.map((category) => (
+                                            <SelectItem key={category.id} value={category.id.toString()}>
+                                                {category.name}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -197,16 +277,15 @@ export function FormNewTask() {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="form-group">
-                                <Label htmlFor="difficulty">Dificultad</Label>
-                                <Select value={formData.difficulty} onValueChange={(value) => handleInputChange('difficulty', value)}>
+                                <Label htmlFor="frequency">Frecuencia</Label>
+                                <Select value={formData.frequency} onValueChange={(value) => handleInputChange('frequency', value)}>
                                     <SelectTrigger className="bg-white text-black border border-slate-200">
                                         <SelectValue placeholder="Seleccionar" />
                                     </SelectTrigger>
                                     <SelectContent className="bg-white text-black border border-slate-200">
-                                        <SelectItem value="facil">Fácil (10 XP)</SelectItem>
-                                        <SelectItem value="media">Media (50 XP)</SelectItem>
-                                        <SelectItem value="epica">Épica (200 XP)</SelectItem>
-                                        <SelectItem value="legendaria">Legendaria (500 XP)</SelectItem>
+                                        <SelectItem value="daily">Diaria</SelectItem>
+                                        <SelectItem value="weekly">Semanal</SelectItem>
+                                        <SelectItem value="once">Única</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>

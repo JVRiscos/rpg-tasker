@@ -1,15 +1,75 @@
-type TareaFrencuencia = {
-    frequency: 'once' | 'daily' | 'weekly' | 'monthly';
-};
+import { router } from '@inertiajs/react';
 
-export function Tarea( {frequency}: TareaFrencuencia ) {
-    const color = 
+interface Category {
+    id: number;
+    name: string;
+    base_xp: number;
+    linked_stat: string;
+}
+
+interface TareaProps {
+    id: number;
+    title: string;
+    description: string | null;
+    frequency: 'once' | 'daily' | 'weekly' | 'monthly';
+    isCompleted: boolean;
+    category: Category;
+    onEdit?: () => void;
+}
+
+export function Tarea({ id, title, description, frequency, isCompleted, category, onEdit }: TareaProps) {
+    const color =
         frequency === 'once' ? 'var(--accent)' :
         frequency === 'daily' ? 'var(--primary)' :
-        frequency === 'weekly' ? 'var(--secondary)' : 
+        frequency === 'weekly' ? '#10b981' :
         frequency === 'monthly' ? '#228B22' :
         'var(--muted)';
-        
+
+    const frequencyText = {
+        once: 'Única',
+        daily: 'Diaria',
+        weekly: 'Semanal',
+        monthly: 'Mensual'
+    };
+
+    const statText = {
+        str: 'FUE',
+        int: 'INT',
+        sta: 'VIT',
+        def: 'DEF'
+    };
+
+    const handleToggleComplete = () => {
+        router.patch(`/tasks/${id}`, {
+            is_completed: !isCompleted
+        }, {
+            preserveScroll: true,
+            onFinish: () => {
+                window.location.reload();
+            }
+        });
+    };
+
+    const handleEdit = () => {
+        if (onEdit) {
+            onEdit();
+            return;
+        }
+
+        router.visit(`/tasks/${id}/edit`);
+    };
+
+    const handleDelete = () => {
+        if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+            router.delete(`/tasks/${id}`, {
+                preserveScroll: true,
+                onFinish: () => {
+                    window.location.reload();
+                }
+            });
+        }
+    };
+
     return (
         <>
             <link
@@ -17,7 +77,7 @@ export function Tarea( {frequency}: TareaFrencuencia ) {
                 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
             />
             <style>{`
-                    
+
                     .quest-card {
                         background: white;
                         border-radius: 12px;
@@ -28,6 +88,7 @@ export function Tarea( {frequency}: TareaFrencuencia ) {
                         transition: transform 0.2s;
                         border-left: 5px solid #cbd5e1;
                         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                        opacity: ${isCompleted ? '0.6' : '1'};
                     }
 
                     .quest-card:hover {
@@ -53,6 +114,7 @@ export function Tarea( {frequency}: TareaFrencuencia ) {
                     .quest-content h4 {
                         margin: 0 0 5px 0;
                         color: var(--dark);
+                        text-decoration: ${isCompleted ? 'line-through' : 'none'};
                     }
 
                     .quest-content p {
@@ -79,6 +141,7 @@ export function Tarea( {frequency}: TareaFrencuencia ) {
                         border-radius: 8px;
                         cursor: pointer;
                         color: #64748b;
+                        transition: all 0.2s;
                     }
 
                     .btn-icon:hover {
@@ -86,8 +149,14 @@ export function Tarea( {frequency}: TareaFrencuencia ) {
                         color: var(--danger);
                     }
 
-                    .quest-daily {
-                        border-left-color: var(--primary);
+                    .btn-complete {
+                        background: ${isCompleted ? '#10b981' : '#f1f5f9'};
+                        color: ${isCompleted ? 'white' : '#64748b'};
+                    }
+
+                    .btn-complete:hover {
+                        background: ${isCompleted ? '#059669' : '#e2e8f0'};
+                        color: ${isCompleted ? 'white' : 'var(--primary)'};
                     }
 
                     .reward-xp {
@@ -95,30 +164,64 @@ export function Tarea( {frequency}: TareaFrencuencia ) {
                         font-weight: bold;
                         display: block;
                     }
-            `}</style>               
-            <div className="quest-card quest-main" style={{ borderLeftColor: color }}>
+
+                    .category-badge {
+                        display: inline-block;
+                        background: #f1f5f9;
+                        color: #64748b;
+                        padding: 2px 8px;
+                        border-radius: 12px;
+                        font-size: 0.75rem;
+                        margin-top: 5px;
+                    }
+            `}</style>
+            <div className="quest-card" style={{ borderLeftColor: color }}>
                 <div className="quest-icon">
-                    <i className="fa-solid fa-code" style={{ color: 'var(--accent)' }} />
+                    <i className={`fa-solid ${
+                        frequency === 'once' ? 'fa-scroll' :
+                        frequency === 'daily' ? 'fa-calendar-day' :
+                        frequency === 'weekly' ? 'fa-calendar-week' :
+                        'fa-calendar-alt'
+                    }`} style={{ color }} />
                 </div>
                 <div className="quest-content">
-                    <h4>Finalizar Proyecto DAW</h4>
-                    <p>Entregar la documentación y el código fuente antes de la fecha límite.</p>
+                    <h4>{title}</h4>
+                    <p>{description || 'Sin descripción'}</p>
+                    <span className="category-badge">
+                        {category.name} • +{category.base_xp} {statText[category.linked_stat as keyof typeof statText] || category.linked_stat.toUpperCase()} XP
+                    </span>
                 </div>
                 <div className="quest-reward">
-                    <span className="reward-xp">+500 INT XP</span>
-                    <small>Dificultad: Épica</small>
+                    <span className="reward-xp">+{category.base_xp} XP</span>
+                    <small>Frecuencia: {frequencyText[frequency]}</small>
                 </div>
                 <div className="btn-actions">
-                    <button className="btn-icon" type="button">
+                    <button
+                        className="btn-icon btn-complete"
+                        type="button"
+                        title={isCompleted ? 'Marcar como pendiente' : 'Marcar como completada'}
+                        onClick={handleToggleComplete}
+                    >
+                        <i className={`fa-solid ${isCompleted ? 'fa-check-circle' : 'fa-circle'}`} />
+                    </button>
+                    <button
+                        className="btn-icon"
+                        type="button"
+                        title="Editar"
+                        onClick={handleEdit}
+                    >
                         <i className="fa-solid fa-pen-to-square" />
                     </button>
-                    <button className="btn-icon" type="button">
+                    <button
+                        className="btn-icon"
+                        type="button"
+                        title="Eliminar"
+                        onClick={handleDelete}
+                    >
                         <i className="fa-solid fa-trash" />
                     </button>
                 </div>
             </div>
-
-
         </>
     )
 }

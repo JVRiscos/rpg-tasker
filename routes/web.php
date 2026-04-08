@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\MisionController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -10,9 +12,11 @@ Route::inertia('/', 'welcome', [
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('bitacora', 'bitacora')->name('bitacora');
     Route::inertia('personaje', 'personaje')->name('personaje');
-    Route::inertia('misiones', 'misiones')->name('misiones');
+    Route::get('misiones', MisionController::class)->name('misiones');
     Route::inertia('tienda', 'tienda')->name('tienda');
     Route::inertia('ajustes', 'ajustes')->name('ajustes');
+
+    Route::resource('tasks', TaskController::class);
 });
 
 require __DIR__.'/settings.php';

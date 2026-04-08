@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { FormNewTask } from '@/components/form-new-task';
@@ -5,6 +6,35 @@ import { misiones } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 import { Tarea } from '@/components/ui/tarea';
 
+interface Task {
+    id: number;
+    title: string;
+    description: string | null;
+    frequency: 'daily' | 'weekly' | 'once';
+    is_completed: boolean;
+    category: {
+        id: number;
+        name: string;
+        base_xp: number;
+        linked_stat: string;
+    };
+}
+
+interface Category {
+    id: number;
+    name: string;
+    base_xp: number;
+    linked_stat: string;
+}
+
+interface MisionesProps {
+    tasks: {
+        daily?: Task[];
+        weekly?: Task[];
+        once?: Task[];
+    };
+    categories: Category[];
+}
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,11 +43,16 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Misiones() {
+export default function Misiones({ tasks, categories }: MisionesProps) {
+    // Agrupar tareas por frecuencia si no vienen agrupadas
+    const groupedTasks = tasks || {};
+    const [editingTask, setEditingTask] = useState<Task | null>(null);
+    const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="RPG-Tasker | Misiones">
-                
+
             </Head>
 
             <div className="min-h-screen bg-[#f8fafc] text-slate-900">
@@ -92,11 +127,19 @@ export default function Misiones() {
                         <div style={{ display: 'flex', gap: '15px' }}>
                             <select>
                                 <option>Todas las categorías</option>
-                                <option>Trabajo</option>
-                                <option>Salud</option>
-                                <option>Estudios</option>
+                                {categories?.map((category) => (
+                                    <option key={category.id} value={category.id}>
+                                        {category.name}
+                                    </option>
+                                ))}
                             </select>
-                            <FormNewTask />
+                            <FormNewTask
+                                categories={categories}
+                                editTask={editingTask}
+                                open={isTaskFormOpen}
+                                setOpen={setIsTaskFormOpen}
+                                clearEditTask={() => setEditingTask(null)}
+                            />
                         </div>
                     </header>
 
@@ -105,11 +148,26 @@ export default function Misiones() {
                             <i className="fa-solid fa-scroll" style={{ color: 'var(--accent)' }} />
                             Misiones Principales
                         </h3>
-                        <Tarea frequency="once" />
-                        <Tarea frequency="daily" />
-                        <Tarea frequency="weekly" />
-                        <Tarea frequency="weekly" />
-                        <Tarea frequency="weekly" />
+                        {groupedTasks.once?.map((task) => (
+                            <Tarea
+                                key={task.id}
+                                id={task.id}
+                                title={task.title}
+                                description={task.description}
+                                frequency={task.frequency}
+                                isCompleted={task.is_completed}
+                                category={task.category}
+                                onEdit={() => {
+                                    setEditingTask(task);
+                                    setIsTaskFormOpen(true);
+                                }}
+                            />
+                        ))}
+                        {(!groupedTasks.once || groupedTasks.once.length === 0) && (
+                            <p className="text-gray-500 text-center py-8">
+                                No tienes misiones principales activas.
+                            </p>
+                        )}
                     </section>
 
                     <section className="quest-section">
@@ -117,44 +175,53 @@ export default function Misiones() {
                             <i className="fa-solid fa-calendar-day" style={{ color: 'var(--primary)' }} />
                             Misiones Diarias
                         </h3>
+                        {groupedTasks.daily?.map((task) => (
+                            <Tarea
+                                key={task.id}
+                                id={task.id}
+                                title={task.title}
+                                description={task.description}
+                                frequency={task.frequency}
+                                isCompleted={task.is_completed}
+                                category={task.category}
+                                onEdit={() => {
+                                    setEditingTask(task);
+                                    setIsTaskFormOpen(true);
+                                }}
+                            />
+                        ))}
+                        {(!groupedTasks.daily || groupedTasks.daily.length === 0) && (
+                            <p className="text-gray-500 text-center py-8">
+                                No tienes misiones diarias activas.
+                            </p>
+                        )}
+                    </section>
 
-                        <div className="quest-card quest-daily">
-                            <div className="quest-icon">
-                                <i className="fa-sharp fa-solid fa-person-running" style={{ color: 'var(--primary)' }} />
-                            </div>
-                            <div className="quest-content">
-                                <h4>Caminar 30 minutos</h4>
-                                <p>Mantén tu vitalidad alta para las batallas diarias.</p>
-                            </div>
-                            <div className="quest-reward">
-                                <span className="reward-xp">+25 VIT XP</span>
-                                <small>Frecuencia: Diaria</small>
-                            </div>
-                            <div className="btn-actions">
-                                <button className="btn-icon" type="button">
-                                    <i className="fa-solid fa-trash" />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="quest-card quest-daily">
-                            <div className="quest-icon">
-                                <i className="fa-solid fa-book" style={{ color: 'var(--primary)' }} />
-                            </div>
-                            <div className="quest-content">
-                                <h4>Lectura Técnica</h4>
-                                <p>Leer 10 páginas de documentación oficial de Laravel.</p>
-                            </div>
-                            <div className="quest-reward">
-                                <span className="reward-xp">+15 INT XP</span>
-                                <small>Frecuencia: Diaria</small>
-                            </div>
-                            <div className="btn-actions">
-                                <button className="btn-icon" type="button">
-                                    <i className="fa-solid fa-trash" />
-                                </button>
-                            </div>
-                        </div>
+                    <section className="quest-section">
+                        <h3>
+                            <i className="fa-solid fa-calendar-week" style={{ color: '#10b981' }} />
+                            Misiones Semanales
+                        </h3>
+                        {groupedTasks.weekly?.map((task) => (
+                            <Tarea
+                                key={task.id}
+                                id={task.id}
+                                title={task.title}
+                                description={task.description}
+                                frequency={task.frequency}
+                                isCompleted={task.is_completed}
+                                category={task.category}
+                                onEdit={() => {
+                                    setEditingTask(task);
+                                    setIsTaskFormOpen(true);
+                                }}
+                            />
+                        ))}
+                        {(!groupedTasks.weekly || groupedTasks.weekly.length === 0) && (
+                            <p className="text-gray-500 text-center py-8">
+                                No tienes misiones semanales activas.
+                            </p>
+                        )}
                     </section>
                 </main>
             </div>
