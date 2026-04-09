@@ -25,4 +25,22 @@ class MisionController extends Controller
             'categories' => Category::all(),
         ]);
     }
+
+    /**
+     * Display the bitacora page with user's tasks.
+     */
+    public function bitacora(): Response
+    {
+        $tasks = Auth::user()->tasks()
+            ->with('category')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy('frequency');
+
+        return Inertia::render('bitacora', [
+            'tasks' => $tasks,
+            'categories' => Category::all(),
+            'character' => Auth::user()->character,
+        ]);
+    }
 }
