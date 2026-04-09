@@ -18,10 +18,9 @@ return new class extends Migration
             $table->string('job_class')->comment('Guerrero, Mago, etc.');
             $table->integer('level')->default(1);
             $table->integer('experience')->default(0);
-            $table->integer('def')->default(10);
-            $table->integer('str')->default(10);
-            $table->integer('int')->default(10);
-            $table->integer('sta')->default(10);
+            $table->integer('str')->default(0);
+            $table->integer('int')->default(0);
+            $table->integer('vit')->default(0);
             $table->timestamps();
         });
     }

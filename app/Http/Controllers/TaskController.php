@@ -94,9 +94,24 @@ class TaskController extends Controller
     {
         $this->authorize('delete', $task);
 
+        // Add XP to user's character
+        $character = $task->user->character;
+        if ($character) {
+            $character->increment('experience', $task->category->base_xp);
+
+            // Check for level up
+            $max = $character->max_experience;
+            while ($character->experience >= $max) {
+                $character->experience -= $max;
+                $character->level += 1;
+                $max = 100 * (2 ** ($character->level - 1));
+            }
+            $character->save();
+        }
+
         $task->delete();
 
         return redirect()->back()
-            ->with('success', 'Tarea eliminada exitosamente.');
+            ->with('success', 'Tarea completada exitosamente.');
     }
 }

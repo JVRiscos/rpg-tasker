@@ -244,7 +244,7 @@ export function FormNewTask({ categories, editTask, open, setOpen, clearEditTask
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="form-group">
-                                <Label htmlFor="category">Categoría</Label>
+                                <Label htmlFor="category">Atributo a Potenciar</Label>
                                 <Select value={formData.category_id} onValueChange={(value) => handleInputChange('category_id', value)}>
                                     <SelectTrigger className="bg-white text-black border border-slate-200">
                                         <SelectValue placeholder="Seleccionar" />
@@ -258,24 +258,6 @@ export function FormNewTask({ categories, editTask, open, setOpen, clearEditTask
                                     </SelectContent>
                                 </Select>
                             </div>
-
-                            <div className="form-group">
-                                <Label htmlFor="attribute">Atributo a Potenciar</Label>
-                                <Select value={formData.attribute} onValueChange={(value) => handleInputChange('attribute', value)}>
-                                    <SelectTrigger className="bg-white text-black border border-slate-200">
-                                        <SelectValue placeholder="Seleccionar" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white text-black border border-slate-200">
-                                        <SelectItem value="STR">Fuerza (STR)</SelectItem>
-                                        <SelectItem value="INT">Inteligencia (INT)</SelectItem>
-                                        <SelectItem value="VIT">Vitalidad (VIT)</SelectItem>
-                                        <SelectItem value="LCK">Suerte (LCK)</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
                             <div className="form-group">
                                 <Label htmlFor="frequency">Frecuencia</Label>
                                 <Select value={formData.frequency} onValueChange={(value) => handleInputChange('frequency', value)}>
@@ -289,6 +271,10 @@ export function FormNewTask({ categories, editTask, open, setOpen, clearEditTask
                                     </SelectContent>
                                 </Select>
                             </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+
 
                             <div className="form-group">
                                 <Label htmlFor="deadline" >Fecha Límite (Opcional)</Label>
@@ -312,4 +298,3 @@ export function FormNewTask({ categories, editTask, open, setOpen, clearEditTask
     );
 }
 
-    
