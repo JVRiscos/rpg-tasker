@@ -15,9 +15,11 @@ interface TareaProps {
     isCompleted: boolean;
     category: Category;
     onEdit?: () => void;
+    onComplete?: () => void;
+    showOnlyComplete?: boolean;
 }
 
-export function Tarea({ id, title, description, frequency, isCompleted, category, onEdit }: TareaProps) {
+export function Tarea({ id, title, description, frequency, isCompleted, category, onEdit, onComplete, showOnlyComplete }: TareaProps) {
     const color =
         frequency === 'once' ? 'var(--accent)' :
         frequency === 'daily' ? 'var(--primary)' :
@@ -40,12 +42,16 @@ export function Tarea({ id, title, description, frequency, isCompleted, category
     };
 
     const handleToggleComplete = () => {
+        if (onComplete) {
+            onComplete();
+            return;
+        }
         router.patch(`/tasks/${id}`, {
             is_completed: !isCompleted
         }, {
             preserveScroll: true,
-            onFinish: () => {
-                window.location.reload();
+            onSuccess: () => {
+                router.reload();
             }
         });
     };
@@ -63,8 +69,8 @@ export function Tarea({ id, title, description, frequency, isCompleted, category
         if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
             router.delete(`/tasks/${id}`, {
                 preserveScroll: true,
-                onFinish: () => {
-                    window.location.reload();
+                onSuccess: () => {
+                    router.reload();
                 }
             });
         }
@@ -89,6 +95,11 @@ export function Tarea({ id, title, description, frequency, isCompleted, category
                         border-left: 5px solid #cbd5e1;
                         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
                         opacity: ${isCompleted ? '0.6' : '1'};
+                    }
+
+                    .quest-card.complete-only {
+                        padding: 25px;
+                        justify-content: space-between;
                     }
 
                     .quest-card:hover {
@@ -159,6 +170,23 @@ export function Tarea({ id, title, description, frequency, isCompleted, category
                         color: ${isCompleted ? 'white' : 'var(--primary)'};
                     }
 
+                    .btn-complete-large {
+                        background: #22c55e;
+                        color: white;
+                        border: none;
+                        padding: 12px 30px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        font-size: 1rem;
+                        transition: all 0.2s;
+                    }
+
+                    .btn-complete-large:hover {
+                        background: #16a34a;
+                        transform: scale(1.05);
+                    }
+
                     .reward-xp {
                         color: var(--primary);
                         font-weight: bold;
@@ -175,7 +203,7 @@ export function Tarea({ id, title, description, frequency, isCompleted, category
                         margin-top: 5px;
                     }
             `}</style>
-            <div className="quest-card" style={{ borderLeftColor: color }}>
+            <div className={`quest-card ${showOnlyComplete ? 'complete-only' : ''}`} style={{ borderLeftColor: color }}>
                 <div className="quest-icon">
                     <i className={`fa-solid ${
                         frequency === 'once' ? 'fa-scroll' :
@@ -191,36 +219,48 @@ export function Tarea({ id, title, description, frequency, isCompleted, category
                         {category.name} • +{category.base_xp} {statText[category.linked_stat as keyof typeof statText] || category.linked_stat.toUpperCase()} XP
                     </span>
                 </div>
-                <div className="quest-reward">
-                    <span className="reward-xp">+{category.base_xp} XP</span>
-                    <small>Frecuencia: {frequencyText[frequency]}</small>
-                </div>
-                <div className="btn-actions">
+                {showOnlyComplete ? (
                     <button
-                        className="btn-icon btn-complete"
+                        className="btn-complete-large"
                         type="button"
-                        title={isCompleted ? 'Marcar como pendiente' : 'Marcar como completada'}
                         onClick={handleToggleComplete}
                     >
-                        <i className={`fa-solid ${isCompleted ? 'fa-check-circle' : 'fa-circle'}`} />
+                        Completar
                     </button>
-                    <button
-                        className="btn-icon"
-                        type="button"
-                        title="Editar"
-                        onClick={handleEdit}
-                    >
-                        <i className="fa-solid fa-pen-to-square" />
-                    </button>
-                    <button
-                        className="btn-icon"
-                        type="button"
-                        title="Eliminar"
-                        onClick={handleDelete}
-                    >
-                        <i className="fa-solid fa-trash" />
-                    </button>
-                </div>
+                ) : (
+                    <>
+                        <div className="quest-reward">
+                            <span className="reward-xp">+{category.base_xp} XP</span>
+                            <small>Frecuencia: {frequencyText[frequency]}</small>
+                        </div>
+                        <div className="btn-actions">
+                            <button
+                                className="btn-icon btn-complete"
+                                type="button"
+                                title={isCompleted ? 'Marcar como pendiente' : 'Marcar como completada'}
+                                onClick={handleToggleComplete}
+                            >
+                                <i className={`fa-solid ${isCompleted ? 'fa-check-circle' : 'fa-circle'}`} />
+                            </button>
+                            <button
+                                className="btn-icon"
+                                type="button"
+                                title="Editar"
+                                onClick={handleEdit}
+                            >
+                                <i className="fa-solid fa-pen-to-square" />
+                            </button>
+                            <button
+                                className="btn-icon"
+                                type="button"
+                                title="Eliminar"
+                                onClick={handleDelete}
+                            >
+                                <i className="fa-solid fa-trash" />
+                            </button>
+                        </div>
+                    </>
+                )}
             </div>
         </>
     )
