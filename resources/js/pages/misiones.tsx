@@ -48,6 +48,21 @@ export default function Misiones({ tasks, categories }: MisionesProps) {
     const groupedTasks = tasks || {};
     const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
+    const [search, setSearch] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState<number | null>(null);
+
+    const filterTasks = (list?: Task[]) => {
+        if (!list) return [];
+        return list.filter((t) => {
+            const matchesSearch = search === '' || t.title.toLowerCase().includes(search.toLowerCase());
+            const matchesCategory = categoryFilter === null || t.category.id === categoryFilter;
+            return matchesSearch && matchesCategory;
+        });
+    };
+
+    const filteredOnce = filterTasks(groupedTasks.once);
+    const filteredDaily = filterTasks(groupedTasks.daily);
+    const filteredWeekly = filterTasks(groupedTasks.weekly);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -122,11 +137,11 @@ export default function Misiones({ tasks, categories }: MisionesProps) {
                     <header className="filter-bar">
                         <div style={{ flex: 1 }}>
                             <i className="fa-solid fa-magnifying-glass" />
-                            <input type="text" placeholder="Buscar misiones..." />
+                            <input type="text" placeholder="Buscar misiones..." value={search} onChange={(e) => setSearch(e.target.value)} />
                         </div>
                         <div style={{ display: 'flex', gap: '15px' }}>
-                            <select>
-                                <option>Todas las categorías</option>
+                            <select value={categoryFilter ?? ''} onChange={(e) => setCategoryFilter(e.target.value ? Number(e.target.value) : null)}>
+                                <option value="">Todas las categorías</option>
                                 {categories?.map((category) => (
                                     <option key={category.id} value={category.id}>
                                         {category.name}
@@ -148,7 +163,7 @@ export default function Misiones({ tasks, categories }: MisionesProps) {
                             <i className="fa-solid fa-scroll" style={{ color: 'var(--accent)' }} />
                             Misiones Principales
                         </h3>
-                        {groupedTasks.once?.map((task) => (
+                        {filteredOnce.map((task) => (
                             <Tarea
                                 key={task.id}
                                 id={task.id}
@@ -163,7 +178,7 @@ export default function Misiones({ tasks, categories }: MisionesProps) {
                                 }}
                             />
                         ))}
-                        {(!groupedTasks.once || groupedTasks.once.length === 0) && (
+                        {filteredOnce.length === 0 && (
                             <p className="text-gray-500 text-center py-8">
                                 No tienes misiones principales activas.
                             </p>
@@ -175,7 +190,7 @@ export default function Misiones({ tasks, categories }: MisionesProps) {
                             <i className="fa-solid fa-calendar-day" style={{ color: 'var(--primary)' }} />
                             Misiones Diarias
                         </h3>
-                        {groupedTasks.daily?.map((task) => (
+                        {filteredDaily.map((task) => (
                             <Tarea
                                 key={task.id}
                                 id={task.id}
@@ -190,7 +205,7 @@ export default function Misiones({ tasks, categories }: MisionesProps) {
                                 }}
                             />
                         ))}
-                        {(!groupedTasks.daily || groupedTasks.daily.length === 0) && (
+                        {filteredDaily.length === 0 && (
                             <p className="text-gray-500 text-center py-8">
                                 No tienes misiones diarias activas.
                             </p>
@@ -202,7 +217,7 @@ export default function Misiones({ tasks, categories }: MisionesProps) {
                             <i className="fa-solid fa-calendar-week" style={{ color: '#10b981' }} />
                             Misiones Semanales
                         </h3>
-                        {groupedTasks.weekly?.map((task) => (
+                        {filteredWeekly.map((task) => (
                             <Tarea
                                 key={task.id}
                                 id={task.id}
@@ -217,7 +232,7 @@ export default function Misiones({ tasks, categories }: MisionesProps) {
                                 }}
                             />
                         ))}
-                        {(!groupedTasks.weekly || groupedTasks.weekly.length === 0) && (
+                        {filteredWeekly.length === 0 && (
                             <p className="text-gray-500 text-center py-8">
                                 No tienes misiones semanales activas.
                             </p>
