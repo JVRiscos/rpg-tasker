@@ -1,3 +1,7 @@
+/*
+ * Explicacion simple del archivo:
+ * Este archivo forma parte de resources/js/pages/bitacora.tsx y ayuda a que la app funcione de forma ordenada.
+ */
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { bitacora } from '@/routes';
@@ -232,20 +236,21 @@ export default function Bitacora({ tasks, categories, character }: BitacoraProps
                         font-size: 2.5rem;
                         color: #94a3b8;
                         flex-shrink: 0;
+                    }
 
-                    button.primary {
+                    .button-primary {
                         width: 100%;
                         background: var(--primary);
                         color: white;
                         border: none;
-                        padding: 12px;
-                        border-radius: 6px;
+                        padding: 10px;
+                        border-radius: 8px;
                         cursor: pointer;
                         font-weight: bold;
-                        transition: background 0.3s;
+                        transition: background 0.2s;
                     }
 
-                    button.primary:hover {
+                    .button-primary:hover {
                         background: var(--secondary);
                     }
                 `}</style>
@@ -403,7 +408,7 @@ export default function Bitacora({ tasks, categories, character }: BitacoraProps
                                     </select>
                                 </div>
 
-                                <button type="submit" className="primary">
+                                <button type="submit" className="button-primary">
                                     Invocar Tarea
                                 </button>
                             </form>
