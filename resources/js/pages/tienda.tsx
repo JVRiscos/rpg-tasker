@@ -1,4 +1,18 @@
+/*
+ * Explicacion simple del archivo:
+ * Este archivo forma parte de resources/js/pages/tienda.tsx y ayuda a que la app funcione de forma ordenada.
+ */
 import { Head } from '@inertiajs/react';
+import * as React from 'react';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogClose,
+    DialogFooter,
+} from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { tienda } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
@@ -11,6 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Tienda() {
+    const [open, setOpen] = React.useState(true);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="RPG-Tasker | Bazar del Héroe">
@@ -19,6 +34,29 @@ export default function Tienda() {
                     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
                 />
             </Head>
+
+            {/* Modal PROXIMAMENTE */}
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="bg-white">
+                    <DialogHeader className="text-center">
+                        <DialogTitle style={{ color: "black" }} className="text-center">PRÓXIMAMENTE</DialogTitle>
+                        <DialogDescription className="text-center">
+                            Esta sección estará disponible en una próxima actualización.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <button
+                                type="button"
+                                className="mt-2 px-4 py-2 rounded bg-primary text-white font-semibold hover:bg-primary/90"
+                                onClick={() => setOpen(false)}
+                            >
+                                Cerrar
+                            </button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <div className="min-h-screen bg-[#f8fafc] text-slate-900">
                 <style>{`
