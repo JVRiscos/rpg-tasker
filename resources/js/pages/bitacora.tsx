@@ -219,6 +219,19 @@ export default function Bitacora({ tasks, categories, character }: BitacoraProps
                         border-radius: 6px;
                         box-sizing: border-box;
                     }
+                        
+                    .avatar {
+                        width: 80px;
+                        height: 80px;
+                        background: #ddd;
+                        border-radius: 50%;
+                        border: 3px solid var(--primary);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 2.5rem;
+                        color: #94a3b8;
+                        flex-shrink: 0;
 
                     button.primary {
                         width: 100%;
@@ -239,11 +252,13 @@ export default function Bitacora({ tasks, categories, character }: BitacoraProps
 
                 <main>
                     <section className="character-header">
-                        <div className="avatar" />
+                        <div className="avatar">
+                            <i className="fa-solid fa-user-ninja" />
+                        </div>
                         <div className="stat-bar">
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <strong>Nivel {character?.level || 1} - {character?.job_class || 'Guerrero'}</strong>
-                                <span>XP: {character?.experience || 0} / {100 * Math.pow(2, (character?.level || 1) - 1)}</span>
+                                <strong>Nivel {currentLevel} - {character?.job_class || 'Aventurero'}</strong>
+                                <span>XP: {currentXP.toLocaleString()} / {maxXP.toLocaleString()}</span>
                             </div>
                             <div className="bar-bg">
                                 <div className="bar-fill" style={{ width: `${progressPercent}%` }} />

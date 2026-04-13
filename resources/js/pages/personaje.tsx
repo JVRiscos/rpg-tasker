@@ -3,6 +3,22 @@ import AppLayout from '@/layouts/app-layout';
 import { personaje } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 
+interface Character {
+    id: number;
+    name: string;
+    job_class: string;
+    level: number;
+    experience: number;
+    str: number;
+    int: number;
+    sta: number;
+    def: number;
+}
+
+interface PersonajeProps {
+    character: Character | null;
+}
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Personaje',
@@ -10,7 +26,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Personaje() {
+export default function Personaje({ character }: PersonajeProps) {
+    const currentLevel = character?.level || 1;
+    const currentXP = character?.experience || 0;
+    const maxXP = 100 * Math.pow(2, currentLevel - 1);
+    const progressPercent = Math.min((currentXP / maxXP) * 100, 100);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="RPG-Tasker | Mi Personaje">
@@ -27,17 +47,62 @@ export default function Personaje() {
                         --secondary: #a855f7;
                         --dark: #1e1e2e;
                         --light: #f8fafc;
-                        --warning: #f59e0b;
+                        --success: #22c55e;
+                        --accent: #f59e0b;
                     }
 
                     main {
                         overflow-y: auto;
                     }
 
-                    .profile-grid {
+                    .character-header {
+                        background: white;
+                        padding: 20px;
+                        border-radius: 12px;
+                        display: flex;
+                        align-items: center;
+                        gap: 20px;
+                        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+                        margin-bottom: 30px;
+                    }
+
+                    .avatar {
+                        width: 80px;
+                        height: 80px;
+                        background: #ddd;
+                        border-radius: 50%;
+                        border: 3px solid var(--primary);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 2.5rem;
+                        color: #94a3b8;
+                        flex-shrink: 0;
+                    }
+
+                    .stat-bar {
+                        flex: 1;
+                    }
+
+                    .bar-bg {
+                        background: #e2e8f0;
+                        height: 12px;
+                        border-radius: 6px;
+                        overflow: hidden;
+                        margin-top: 5px;
+                    }
+
+                    .bar-fill {
+                        background: linear-gradient(90deg, var(--primary), var(--secondary));
+                        height: 100%;
+                        width: 65%;
+                        transition: 0.5s;
+                    }
+
+                    .stats-container {
                         display: grid;
-                        grid-template-columns: 350px 1fr;
-                        gap: 30px;
+                        grid-template-columns: 1fr 1fr 1fr;
+                        gap: 20px;
                     }
 
                     .card {
@@ -45,36 +110,6 @@ export default function Personaje() {
                         padding: 25px;
                         border-radius: 15px;
                         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-                        text-align: center;
-                    }
-
-                    .avatar-large {
-                        width: 180px;
-                        height: 180px;
-                        background: #e2e8f0;
-                        border-radius: 20px;
-                        margin: 0 auto 20px;
-                        border: 4px solid var(--secondary);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 4rem;
-                        color: #94a3b8;
-                    }
-
-                    .level-badge {
-                        background: var(--secondary);
-                        color: white;
-                        padding: 5px 15px;
-                        border-radius: 20px;
-                        font-weight: bold;
-                        font-size: 1.1rem;
-                    }
-
-                    .stats-container {
-                        display: grid;
-                        grid-template-columns: 1fr 1fr;
-                        gap: 20px;
                     }
 
                     .stat-card {
@@ -129,120 +164,92 @@ export default function Personaje() {
                     }
                 `}</style>
 
-                <div>
-                    <main>
-                        <div className="profile-grid">
-                            <aside className="card">
-                                <div className="avatar-large">
-                                    <i className="fa-solid fa-user-ninja" />
-                                </div>
-                                <h2>Nombre de Usuario</h2>
-                                <p>
-                                    <span className="level-badge">NIVEL 12</span>
-                                </p>
-                                <p style={{ color: '#64748b' }}>Clase: Guerrero del Código</p>
-
-                                <hr style={{ border: 0, borderTop: '1px solid #eee', margin: '20px 0' }} />
-
-                                <div style={{ textAlign: 'left' }}>
-                                    <small>Experiencia Total: 12,450 XP</small>
-                                    <div
-                                        style={{
-                                            background: '#e2e8f0',
-                                            height: '8px',
-                                            borderRadius: '4px',
-                                            marginTop: '5px',
-                                        }}
-                                    >
-                                        <div
-                                            style={{
-                                                background: 'var(--primary)',
-                                                width: '65%',
-                                                height: '100%',
-                                                borderRadius: '4px',
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            </aside>
-
-                            <section>
-                                <div className="card">
-                                    <h3 style={{ textAlign: 'left', marginTop: 0 }}>
-                                        <i className="fa-solid fa-chart-simple" /> Atributos del Héroe
-                                    </h3>
-
-                                    <div className="stats-container">
-                                        <div className="stat-card">
-                                            <div className="stat-icon">
-                                                <i className="fa-solid fa-dumbbell" />
-                                            </div>
-                                            <div className="stat-info">
-                                                <h4>Fuerza (STR)</h4>
-                                                <p>15</p>
-                                            </div>
-                                        </div>
-                                        <div className="stat-card">
-                                            <div className="stat-icon">
-                                                <i className="fa-solid fa-brain" />
-                                            </div>
-                                            <div className="stat-info">
-                                                <h4>Inteligencia (INT)</h4>
-                                                <p>22</p>
-                                            </div>
-                                        </div>
-                                        <div className="stat-card">
-                                            <div className="stat-icon">
-                                                <i className="fa-solid fa-heart" />
-                                            </div>
-                                            <div className="stat-info">
-                                                <h4>Vitalidad (VIT)</h4>
-                                                <p>10</p>
-                                            </div>
-                                        </div>
-                                        <div className="stat-card">
-                                            <div className="stat-icon">
-                                                <i className="fa-solid fa-clover" />
-                                            </div>
-                                            <div className="stat-info">
-                                                <h4>Suerte (LCK)</h4>
-                                                <p>5</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="points-banner">
-                                        <div>
-                                            <strong>¡Has subido de nivel!</strong>
-                                            <br />
-                                            <small>Tienes 3 puntos de estadística para asignar.</small>
-                                        </div>
-                                        <button className="btn-upgrade" type="button">
-                                            Asignar Puntos
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="card" style={{ marginTop: '20px' }}>
-                                    <h3 style={{ textAlign: 'left', marginTop: 0 }}>
-                                        <i className="fa-solid fa-award" /> Logros Recientes
-                                    </h3>
-                                    <ul style={{ textAlign: 'left', listStyle: 'none', padding: 0 }}>
-                                        <li style={{ padding: '10px 0', borderBottom: '1px solid #f1f5f9' }}>
-                                            <i className="fa-solid fa-check-circle" style={{ color: 'var(--success)' }} />{' '}
-                                            <strong>Madrugador:</strong> Completaste 5 tareas antes de las 9:00 AM.
-                                        </li>
-                                        <li style={{ padding: '10px 0' }}>
-                                            <i className="fa-solid fa-check-circle" style={{ color: 'var(--success)' }} />{' '}
-                                            <strong>Erudito:</strong> Subiste Inteligencia a nivel 20.
-                                        </li>
-                                    </ul>
-                                </div>
-                            </section>
+                <main>
+                    <section className="character-header">
+                        <div className="avatar">
+                            <i className="fa-solid fa-user-ninja" />
                         </div>
-                    </main>
-                </div>
+                        <div className="stat-bar">
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <strong>Nivel {currentLevel} - {character?.job_class || 'Aventurero'}</strong>
+                                <span>XP: {currentXP.toLocaleString()} / {maxXP.toLocaleString()}</span>
+                            </div>
+                            <div className="bar-bg">
+                                <div className="bar-fill" style={{ width: `${progressPercent}%` }} />
+                            </div>
+                        </div>
+                        <div>
+                            <strong>Atributos:</strong>
+                            <br />
+                            <small>STR: {character?.str || 10} | INT: {character?.int || 10} | VIT: {character?.sta || 10}</small>
+                        </div>
+                    </section>
+
+                    <div className="card">
+                        <h3 style={{ textAlign: 'left', marginTop: 0 }}>
+                            <i className="fa-solid fa-user-shield" style={{ color: 'var(--accent)' }} /> Atributos del Héroe
+                        </h3>
+
+                        <div className="stats-container">
+                            <div className="stat-card">
+                                <div className="stat-icon">
+                                    <i className="fa-solid fa-dumbbell" />
+                                </div>
+                                <div className="stat-info">
+                                    <h4>Fuerza (STR)</h4>
+                                    <p>{character?.str || 10}</p>
+                                </div>
+                            </div>
+                            <div className="stat-card">
+                                <div className="stat-icon">
+                                    <i className="fa-solid fa-brain" />
+                                </div>
+                                <div className="stat-info">
+                                    <h4>Inteligencia (INT)</h4>
+                                    <p>{character?.int || 10}</p>
+                                </div>
+                            </div>
+                            <div className="stat-card">
+                                <div className="stat-icon">
+                                    <i className="fa-solid fa-heart" />
+                                </div>
+                                <div className="stat-info">
+                                    <h4>Vitalidad (VIT)</h4>
+                                    <p>{character?.sta || 10}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="points-banner">
+                            <div>
+                                <strong>¡Has subido de nivel!</strong>
+                                <br />
+                                <small>Tienes 3 puntos de estadística para asignar.</small>
+                            </div>
+                            <button className="btn-upgrade" type="button">
+                                Asignar Puntos
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="card" style={{ marginTop: '20px' }}>
+                        <h3 style={{ textAlign: 'left', marginTop: 0 }}>
+                            <i className="fa-solid fa-award" /> Logros Recientes
+                        </h3>
+                        <ul style={{ textAlign: 'left', listStyle: 'none', padding: 0 }}>
+                            <li style={{ padding: '10px 0', borderBottom: '1px solid #f1f5f9' }}>
+                                <i className="fa-solid fa-check-circle" style={{ color: 'var(--success)' }} />{' '}
+                                <strong>Madrugador:</strong> Completaste 5 tareas antes de las 9:00 AM.
+                            </li>
+                            <li style={{ padding: '10px 0' }}>
+                                <i className="fa-solid fa-check-circle" style={{ color: 'var(--success)' }} />{' '}
+                                <strong>Erudito:</strong> Subiste Inteligencia a nivel 20.
+                            </li>
+                        </ul>
+                    </div>
+                </main>
             </div>
         </AppLayout>
     );
 }
+

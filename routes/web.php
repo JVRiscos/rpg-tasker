@@ -11,7 +11,7 @@ Route::inertia('/', 'welcome', [
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('bitacora', [MisionController::class, 'bitacora'])->name('bitacora');
-    Route::inertia('personaje', 'personaje')->name('personaje');
+    Route::get('personaje', [MisionController::class, 'personaje'])->name('personaje');
     Route::get('misiones', MisionController::class)->name('misiones');
     Route::inertia('tienda', 'tienda')->name('tienda');
     Route::inertia('ajustes', 'ajustes')->name('ajustes');

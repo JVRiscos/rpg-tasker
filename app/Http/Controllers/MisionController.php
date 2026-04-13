@@ -43,4 +43,14 @@ class MisionController extends Controller
             'character' => Auth::user()->character,
         ]);
     }
+
+    /**
+     * Display the personaje page with character stats.
+     */
+    public function personaje(): Response
+    {
+        return Inertia::render('personaje', [
+            'character' => Auth::user()->character,
+        ]);
+    }
 }
