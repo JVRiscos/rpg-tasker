@@ -21,6 +21,10 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
+/**
+ * Interfaces de TypeScript para garantizar el tipado estricto.
+ * Esto evita errores en tiempo de desarrollo al manejar objetos de tarea y categoría.
+ */
 interface Category {
     id: number;
     name: string;
@@ -37,7 +41,7 @@ interface TaskEdit {
 
 interface FormNewTaskProps {
     categories: Category[];
-    editTask?: TaskEdit | null;
+    editTask?: TaskEdit | null; // Si existe, el formulario entra en modo "Edición"
     open: boolean;
     setOpen: (open: boolean) => void;
     clearEditTask: () => void;
@@ -53,9 +57,18 @@ const emptyForm = {
     deadline: '',
 };
 
+/**
+ * FormNewTask: Componente modal para la creación y edición de misiones.
+ * Utiliza un estado local para controlar los campos del formulario antes de enviarlos.
+ */
 export function FormNewTask({ categories, editTask, open, setOpen, clearEditTask }: FormNewTaskProps) {
     const [formData, setFormData] = useState({ ...emptyForm });
 
+    /**
+     * useEffect para el control de estados de edición.
+     * Si 'editTask' tiene datos, pre-rellenamos el formulario.
+     * Si el modal se cierra, reseteamos los campos.
+     */
     useEffect(() => {
         if (editTask) {
             setFormData({
@@ -76,15 +89,10 @@ export function FormNewTask({ categories, editTask, open, setOpen, clearEditTask
         }
     }, [editTask, open, setOpen]);
 
-    const handleInputChange = (field: string, value: string) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-    };
-
-
-    const resetForm = () => {
-        setFormData({ ...emptyForm });
-    };
-
+    /**
+     * Función para enviar los datos al servidor.
+     * Diferencia entre POST (crear) y PUT (actualizar) usando el router de Inertia.
+     */
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -97,199 +105,92 @@ export function FormNewTask({ categories, editTask, open, setOpen, clearEditTask
         };
 
         if (editTask) {
+            // Modo Edición
             router.put(`/tasks/${editTask.id}`, payload, {
                 preserveScroll: true,
                 onSuccess: () => {
                     setOpen(false);
                     clearEditTask();
-                    resetForm();
-                    window.location.reload();
+                    window.location.reload(); // Refresco para actualizar estados de gamificación
                 },
             });
             return;
         }
 
+        // Modo Creación
         router.post('/tasks', payload, {
             preserveScroll: true,
             onSuccess: () => {
                 setOpen(false);
-                resetForm();
                 window.location.reload();
             },
         });
     };
 
-    const handleOpenNew = () => {
-        clearEditTask();
-        resetForm();
-        setOpen(true);
-    };
-
     return (
         <Dialog open={open} onOpenChange={(value) => {
-            if (!value) {
-                clearEditTask();
-            }
+            if (!value) clearEditTask();
             setOpen(value);
         }}>
             <DialogTrigger asChild>
-                <Button type="button" onClick={handleOpenNew} className="bg-[#6366f1] hover:bg-[#a855f7] text-white">
+                <Button type="button" className="bg-[#6366f1] hover:bg-[#a855f7] text-white">
                     + Nueva Misión
                 </Button>
             </DialogTrigger>
+            
             <DialogContent className="sm:max-w-[425px] bg-white">
-                <style>{`
-                    :root {
-                        --primary: #6366f1;
-                        --secondary: #a855f7;
-                        --dark: #1e1e2e;
-                        --light: #f8fafc;
-                        --danger: #ef4444;
-                        --success: #22c55e;
-                    }
-
-                    .form-group {
-                        margin-bottom: 15px;
-                    }
-
-                    .form-group label {
-                        display: block;
-                        margin-bottom: 5px;
-                        font-weight: 500;
-                        color: #334155;
-                    }
-
-                    .form-group input,
-                    .form-group textarea {
-                        width: 100%;
-                        padding: 10px;
-                        border: 1px solid #cbd5e1;
-                        border-radius: 6px;
-                        box-sizing: border-box;
-                        font-size: 0.875rem;
-                        background: white;
-                        color: #0f172a;
-                    }
-
-                    .form-group textarea {
-                        resize: vertical;
-                        min-height: 80px;
-                    }
-
-                    [data-slot="select-trigger"] {
-                        background: white;
-                        color: #0f172a;
-                        border-color: #cbd5e1;
-                    }
-
-                    [data-slot="select-content"] {
-                        background: white;
-                        color: #0f172a;
-                        border-color: #e2e8f0;
-                    }
-
-                    [data-slot="select-item"] {
-                        background: white;
-                        color: #0f172a;
-                    }
-
-                    [data-slot="select-item"][data-highlighted] {
-                        background: #000;
-                        color: white;
-                    }
-
-                    .btn-submit {
-                        background: var(--primary);
-                        color: white;
-                        border: none;
-                        padding: 12px;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        font-weight: bold;
-                        transition: background 0.3s;
-                    }
-
-                    .btn-submit:hover {
-                        background: var(--secondary);
-                    }
-                `}</style>
                 <DialogHeader>
                     <DialogTitle className="text-[#1e1e2e]">Invocar Nueva Misión</DialogTitle>
                     <DialogDescription>
                         Crea una nueva tarea para potenciar tus atributos y ganar experiencia.
                     </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit}>
-                    <div className="grid gap-4 py-4">
+
+                <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+                    {/* Campos del formulario con vinculación bidireccional (Two-way binding) */}
+                    <div className="form-group">
+                        <Label htmlFor="name">Nombre de la Misión</Label>
+                        <Input 
+                            id="name" 
+                            value={formData.name} 
+                            onChange={(e) => setFormData({...formData, name: e.target.value})} 
+                            required 
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
                         <div className="form-group">
-                            <Label htmlFor="name">Nombre de la Misión</Label>
-                            <Input
-                                id="name"
-                                value={formData.name}
-                                onChange={(e) => handleInputChange('name', e.target.value)}
-                                placeholder="Ej: Estudiar React Hooks"
-                                required
-                            />
+                            <Label>Atributo a Potenciar</Label>
+                            <Select value={formData.category_id} onValueChange={(v) => setFormData({...formData, category_id: v})}>
+                                <SelectTrigger className="bg-white text-black">
+                                    <SelectValue placeholder="Seleccionar" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white">
+                                    {categories.map((cat) => (
+                                        <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
-
+                        
                         <div className="form-group">
-                            <Label htmlFor="description">Descripción</Label>
-                            <Textarea
-                                id="description"
-                                value={formData.description}
-                                onChange={(e) => handleInputChange('description', e.target.value)}
-                                placeholder="Describe la misión en detalle..."
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="form-group">
-                                <Label htmlFor="category">Atributo a Potenciar</Label>
-                                <Select value={formData.category_id} onValueChange={(value) => handleInputChange('category_id', value)}>
-                                    <SelectTrigger className="bg-white text-black border border-slate-200">
-                                        <SelectValue placeholder="Seleccionar" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white text-black border border-slate-200">
-                                        {categories.map((category) => (
-                                            <SelectItem key={category.id} value={category.id.toString()}>
-                                                {category.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="form-group">
-                                <Label htmlFor="frequency">Frecuencia</Label>
-                                <Select value={formData.frequency} onValueChange={(value) => handleInputChange('frequency', value)}>
-                                    <SelectTrigger className="bg-white text-black border border-slate-200">
-                                        <SelectValue placeholder="Seleccionar" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white text-black border border-slate-200">
-                                        <SelectItem value="daily">Diaria</SelectItem>
-                                        <SelectItem value="weekly">Semanal</SelectItem>
-                                        <SelectItem value="once">Única</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-
-
-                            <div className="form-group">
-                                <Label htmlFor="deadline" >Fecha Límite (Opcional)</Label>
-                                <Input style={{ color: 'black' }}
-                                    id="deadline"
-                                    type="date"
-                                    value={formData.deadline}
-                                    onChange={(e) => handleInputChange('deadline', e.target.value)}
-                                />
-                            </div>
+                            <Label>Frecuencia</Label>
+                            <Select value={formData.frequency} onValueChange={(v) => setFormData({...formData, frequency: v})}>
+                                <SelectTrigger className="bg-white text-black">
+                                    <SelectValue placeholder="Seleccionar" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white">
+                                    <SelectItem value="daily">Diaria</SelectItem>
+                                    <SelectItem value="weekly">Semanal</SelectItem>
+                                    <SelectItem value="once">Única</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
+
                     <DialogFooter>
-                        <Button type="submit" className="btn-submit">
-                            Invocar Misión
+                        <Button type="submit" className="w-full bg-[#6366f1] hover:bg-[#a855f7] text-white font-bold">
+                            {editTask ? 'Actualizar Misión' : 'Invocar Misión'}
                         </Button>
                     </DialogFooter>
                 </form>
@@ -297,4 +198,3 @@ export function FormNewTask({ categories, editTask, open, setOpen, clearEditTask
         </Dialog>
     );
 }
-

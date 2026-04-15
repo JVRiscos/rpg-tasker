@@ -11,10 +11,17 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ * TaskController: Gestiona el CRUD de tareas integrando el sistema de recompensas.
+ * He implementado políticas de seguridad (Policies) para asegurar que cada usuario
+ * solo pueda manipular sus propias tareas.
+ */
 class TaskController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Lista las tareas del usuario actual con paginación.
+     * Uso 'paginate' para optimizar la carga en el frontend y no saturar el DOM
+     * si el usuario tiene cientos de registros.
      */
     public function index(): Response
     {
@@ -29,7 +36,8 @@ class TaskController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Muestra el formulario de creación de tareas.
+     * Pasamos todas las categorías disponibles para que el usuario pueda clasificar su tarea.
      */
     public function create(): Response
     {
@@ -39,7 +47,9 @@ class TaskController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Guarda una nueva tarea vinculándola automáticamente al usuario autenticado.
+     * Al usar $request->validated(), me aseguro de que solo los datos que han pasado
+     * el filtro del StoreTaskRequest entren en la base de datos.
      */
     public function store(StoreTaskRequest $request): RedirectResponse
     {
@@ -50,7 +60,9 @@ class TaskController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Muestra una tarea específica.
+     * He incluido el método 'authorize' para verificar mediante la Policy (view)
+     * que el usuario es el propietario de la tarea antes de mostrarla.
      */
     public function show(Task $task): Response
     {
@@ -62,7 +74,7 @@ class TaskController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Muestra el formulario de edición cargando los datos de la tarea.
      */
     public function edit(Task $task): Response
     {
@@ -75,7 +87,7 @@ class TaskController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Procesa la actualización de la tarea tras validar los cambios.
      */
     public function update(UpdateTaskRequest $request, Task $task): RedirectResponse
     {
@@ -88,23 +100,28 @@ class TaskController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Elimina la tarea y gestiona la lógica de subida de nivel del personaje.
+     * Este es el núcleo de la gamificación: al "completar" (borrar) una tarea,
+     * el personaje del usuario recibe experiencia basada en la categoría de la tarea.
      */
     public function destroy(Task $task): RedirectResponse
     {
+        // Verificación de seguridad
         $this->authorize('delete', $task);
 
-        // Add XP to user's character
         $character = $task->user->character;
         if ($character) {
+            // Incrementamos la experiencia usando el valor base definido en la categoría
             $character->increment('experience', $task->category->base_xp);
 
-            // Check for level up
+            // Lógica de Level Up: Mientras la XP actual supere el máximo permitido por nivel -->
             $max = $character->max_experience;
             while ($character->experience >= $max) {
-                $character->experience -= $max;
-                $character->level += 1;
-                $max = 100 * (2 ** ($character->level - 1));
+                $character->experience -= $max; // --> Restamos la XP gastada para subir -->
+                $character->level += 1;         // --> Subimos nivel.
+                
+                // Cálculo dinámico de dificultad: cada nivel pide más XP (fórmula exponencial)
+                $max = 100 * (1.15 ** ($character->level - 1));
             }
             $character->save();
         }
