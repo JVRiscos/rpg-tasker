@@ -7,22 +7,12 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * TaskFactory: Clase encargada de generar datos de prueba para la tabla 'tasks'.
- * He personalizado los datos para que coincidan con la temática RPG del proyecto,
- * lo que facilita las pruebas de interfaz y de lógica de negocio.
+ * @extends Factory<Task>
  */
 class TaskFactory extends Factory
 {
-    /**
-     * El modelo que este factory representa.
-     */
     protected $model = Task::class;
 
-    /**
-     * Array de tareas de ejemplo con temática de aventura.
-     * He definido esto manualmente para que la aplicación tenga un aspecto
-     * profesional y coherente durante las demostraciones.
-     */
     protected static array $exampleTasks = [
         [
             'title' => 'Entrenar con espada',
@@ -57,20 +47,16 @@ class TaskFactory extends Factory
     ];
 
     /**
-     * Define el estado por defecto del modelo.
-     * Combina una tarea aleatoria de nuestro array con las claves foráneas necesarias.
-     * * @return array<string, mixed>
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
      */
     public function definition(): array
     {
         return array_merge(
-            // Selecciona una de las tareas temáticas predefinidas
             fake()->randomElement(self::$exampleTasks),
             [
-                // Crea automáticamente un usuario si no se le pasa uno
                 'user_id' => User::factory(),
-                
-                // Por defecto asignamos la categoría 1 (que suele ser la básica)
                 'category_id' => 1,
             ]
         );

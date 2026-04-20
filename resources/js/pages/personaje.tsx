@@ -1,31 +1,24 @@
-/**
- * Archivo: resources/js/pages/personaje.tsx
- * Propósito: Visualización detallada del perfil del jugador, estadísticas (RPG) y logros.
- */
-
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { personaje } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 
-// --- INTERFAZ DEL PERSONAJE ---
 interface Character {
     id: number;
     name: string;
-    job_class: string; // Ej: 'Guerrero', 'Mago', 'Aventurero'
+    job_class: string;
     level: number;
     experience: number;
-    str: number; // Fuerza
-    int: number; // Inteligencia
-    sta: number; // Vitalidad/Stamina
-    def: number; // Defensa
+    str: number;
+    int: number;
+    sta: number;
+    def: number;
 }
 
 interface PersonajeProps {
     character: Character | null;
 }
 
-// Configuración de las migas de pan (Breadcrumbs)
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Personaje',
@@ -34,22 +27,13 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Personaje({ character }: PersonajeProps) {
-    // --- CÁLCULOS DE PROGRESO ---
     const currentLevel = character?.level || 1;
     const currentXP = character?.experience || 0;
-    
-    /** * Lógica de Curva de Nivel:
-     * El máximo de XP necesario dobla cada nivel: Niv 1 (100), Niv 2 (200), Niv 3 (400)...
-     */
     const maxXP = 100 * Math.pow(2, currentLevel - 1);
-    
-    // Calcula el porcentaje para la barra de nivel (CSS width)
     const progressPercent = Math.min((currentXP / maxXP) * 100, 100);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="RPG-Tasker | Mi Personaje">
-                {/* Cargamos FontAwesome para los iconos de estadísticas */}
                 <link
                     rel="stylesheet"
                     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -58,31 +42,129 @@ export default function Personaje({ character }: PersonajeProps) {
 
             <div className="min-h-screen bg-[#f8fafc] text-slate-900">
                 <style>{`
-                    /* Variables de color específicas para la identidad visual del personaje */
                     :root {
                         --primary: #6366f1;
                         --secondary: #a855f7;
+                        --dark: #1e1e2e;
+                        --light: #f8fafc;
                         --success: #22c55e;
                         --accent: #f59e0b;
                     }
 
-                    /* ... estilos de layout ... */
+                    main {
+                        overflow-y: auto;
+                    }
+
+                    .character-header {
+                        background: white;
+                        padding: 20px;
+                        border-radius: 12px;
+                        display: flex;
+                        align-items: center;
+                        gap: 20px;
+                        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+                        margin-bottom: 30px;
+                    }
+
+                    .avatar {
+                        width: 80px;
+                        height: 80px;
+                        background: #ddd;
+                        border-radius: 50%;
+                        border: 3px solid var(--primary);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 2.5rem;
+                        color: #94a3b8;
+                        flex-shrink: 0;
+                    }
+
+                    .stat-bar {
+                        flex: 1;
+                    }
+
+                    .bar-bg {
+                        background: #e2e8f0;
+                        height: 12px;
+                        border-radius: 6px;
+                        overflow: hidden;
+                        margin-top: 5px;
+                    }
 
                     .bar-fill {
                         background: linear-gradient(90deg, var(--primary), var(--secondary));
                         height: 100%;
-                        transition: width 0.5s ease-in-out; /* Transición suave al ganar XP */
+                        width: 65%;
+                        transition: 0.5s;
                     }
 
                     .stats-container {
                         display: grid;
-                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                        grid-template-columns: 1fr 1fr 1fr;
                         gap: 20px;
+                    }
+
+                    .card {
+                        background: white;
+                        padding: 25px;
+                        border-radius: 15px;
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                    }
+
+                    .stat-card {
+                        background: #f1f5f9;
+                        padding: 15px;
+                        border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        gap: 15px;
+                        border: 1px solid #e2e8f0;
+                        text-align: left;
+                    }
+
+                    .stat-icon {
+                        font-size: 1.5rem;
+                        color: var(--primary);
+                        width: 30px;
+                    }
+
+                    .stat-info h4 {
+                        margin: 0;
+                        color: #64748b;
+                        font-size: 0.8rem;
+                        text-transform: uppercase;
+                    }
+
+                    .stat-info p {
+                        margin: 0;
+                        font-size: 1.3rem;
+                        font-weight: bold;
+                    }
+
+                    .points-banner {
+                        background: linear-gradient(135deg, var(--primary), var(--secondary));
+                        color: white;
+                        padding: 15px;
+                        border-radius: 10px;
+                        margin-top: 20px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+
+                    .btn-upgrade {
+                        background: white;
+                        color: var(--primary);
+                        border: none;
+                        padding: 5px 10px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-weight: bold;
                     }
                 `}</style>
 
                 <main>
-                    {/* SECCIÓN 1: Header de Identidad y Barra de XP */}
                     <section className="character-header">
                         <div className="avatar">
                             <i className="fa-solid fa-user-ninja" />
@@ -96,7 +178,6 @@ export default function Personaje({ character }: PersonajeProps) {
                                 <div className="bar-fill" style={{ width: `${progressPercent}%` }} />
                             </div>
                         </div>
-                        {/* Resumen rápido de atributos */}
                         <div>
                             <strong>Atributos:</strong>
                             <br />
@@ -104,34 +185,34 @@ export default function Personaje({ character }: PersonajeProps) {
                         </div>
                     </section>
 
-                    {/* SECCIÓN 2: Desglose de Atributos */}
                     <div className="card">
                         <h3 style={{ textAlign: 'left', marginTop: 0 }}>
                             <i className="fa-solid fa-user-shield" style={{ color: 'var(--accent)' }} /> Atributos del Héroe
                         </h3>
 
                         <div className="stats-container">
-                            {/* Card: Fuerza */}
                             <div className="stat-card">
-                                <div className="stat-icon"><i className="fa-solid fa-dumbbell" /></div>
+                                <div className="stat-icon">
+                                    <i className="fa-solid fa-dumbbell" />
+                                </div>
                                 <div className="stat-info">
                                     <h4>Fuerza (STR)</h4>
                                     <p>{character?.str || 10}</p>
                                 </div>
                             </div>
-                            
-                            {/* Card: Inteligencia */}
                             <div className="stat-card">
-                                <div className="stat-icon"><i className="fa-solid fa-brain" /></div>
+                                <div className="stat-icon">
+                                    <i className="fa-solid fa-brain" />
+                                </div>
                                 <div className="stat-info">
                                     <h4>Inteligencia (INT)</h4>
                                     <p>{character?.int || 10}</p>
                                 </div>
                             </div>
-
-                            {/* Card: Vitalidad */}
                             <div className="stat-card">
-                                <div className="stat-icon"><i className="fa-solid fa-heart" /></div>
+                                <div className="stat-icon">
+                                    <i className="fa-solid fa-heart" />
+                                </div>
                                 <div className="stat-info">
                                     <h4>Vitalidad (VIT)</h4>
                                     <p>{character?.sta || 10}</p>
@@ -139,7 +220,6 @@ export default function Personaje({ character }: PersonajeProps) {
                             </div>
                         </div>
 
-                        {/* Banner de Level Up (Solo visible si hay puntos pendientes) */}
                         <div className="points-banner">
                             <div>
                                 <strong>¡Has subido de nivel!</strong>
@@ -152,7 +232,6 @@ export default function Personaje({ character }: PersonajeProps) {
                         </div>
                     </div>
 
-                    {/* SECCIÓN 3: Logros (Hardcoded por ahora) */}
                     <div className="card" style={{ marginTop: '20px' }}>
                         <h3 style={{ textAlign: 'left', marginTop: 0 }}>
                             <i className="fa-solid fa-award" /> Logros Recientes
@@ -173,3 +252,4 @@ export default function Personaje({ character }: PersonajeProps) {
         </AppLayout>
     );
 }
+

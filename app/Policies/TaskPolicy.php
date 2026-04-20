@@ -5,27 +5,18 @@ namespace App\Policies;
 use App\Models\Task;
 use App\Models\User;
 
-/**
- * TaskPolicy: Define quién puede realizar acciones sobre las tareas.
- * Implementa la lógica de autorización para asegurar la privacidad: 
- * "Mis tareas son solo mías".
- */
 class TaskPolicy
 {
     /**
-     * Determina si el usuario puede ver su propio listado de tareas.
-     * Permitimos el acceso (true) ya que el filtrado por 'user_id' 
-     * se realiza a nivel de consulta en el controlador.
+     * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return true; 
+        return true; // Los usuarios autenticados pueden ver sus propias tareas
     }
 
     /**
-     * Determina si el usuario puede ver los detalles de una tarea concreta.
-     * Verificamos que el ID del usuario autenticado coincida con el 
-     * propietario de la tarea (user_id).
+     * Determine whether the user can view the model.
      */
     public function view(User $user, Task $task): bool
     {
@@ -33,18 +24,15 @@ class TaskPolicy
     }
 
     /**
-     * Determina si el usuario tiene permiso para crear nuevas tareas.
-     * Retornamos true para cualquier usuario que haya superado el middleware de auth.
+     * Determine whether the user can create models.
      */
     public function create(User $user): bool
     {
-        return true; 
+        return true; // Los usuarios autenticados pueden crear tareas
     }
 
     /**
-     * Determina si el usuario puede modificar una tarea existente.
-     * Es vital comprobar la propiedad para evitar que un usuario edite 
-     * tareas de otros modificando los parámetros de la petición HTTP.
+     * Determine whether the user can update the model.
      */
     public function update(User $user, Task $task): bool
     {
@@ -52,8 +40,7 @@ class TaskPolicy
     }
 
     /**
-     * Determina si el usuario puede eliminar una tarea.
-     * Solo el creador de la misión tiene el privilegio de completarla/eliminarla.
+     * Determine whether the user can delete the model.
      */
     public function delete(User $user, Task $task): bool
     {
@@ -61,7 +48,7 @@ class TaskPolicy
     }
 
     /**
-     * Lógica para restaurar tareas eliminadas (si se usara Soft Deletes).
+     * Determine whether the user can restore the model.
      */
     public function restore(User $user, Task $task): bool
     {
@@ -69,7 +56,7 @@ class TaskPolicy
     }
 
     /**
-     * Determina si el usuario puede purgar físicamente la tarea de la base de datos.
+     * Determine whether the user can permanently delete the model.
      */
     public function forceDelete(User $user, Task $task): bool
     {
